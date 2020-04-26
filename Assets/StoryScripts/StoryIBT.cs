@@ -78,7 +78,9 @@ public class StoryIBT : MonoBehaviour
 	private Node StoryTree()
 	{
 		return new Sequence(
-			StartStoryArc.Get());
+			// StartStoryArc.Get(),
+			EndStoryArc.Get(hero, enemy,GameObject.FindGameObjectWithTag("enemyDoor")
+			));
 	}
 }
 
