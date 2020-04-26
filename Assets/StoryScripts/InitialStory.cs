@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class InitialStory
 {
-    public static Node initial(GameObject hero)
+    public static Node Get(GameObject hero)
     {
         return new Sequence(new LeafWait(1000), selfTalk(hero, "Where is he?"), new LeafWait(3000), hideBoxTalk(hero), selfTalk(hero, "Must be hiding somewhere"), new LeafWait(3000), hideBoxTalk(hero));
 

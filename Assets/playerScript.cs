@@ -7,34 +7,35 @@ public class playerScript : MonoBehaviour
 {
     public List<GameObject> people;
     public GameObject dialogBox;
-    //public TextMesh text;
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-
         people = new List<GameObject>();
-        //text.SetActive(false);
-        //text.GetComponent<TextMesh>().text = "";
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (!people.Contains(other.GetComponent<GameObject>()))
+        if (other.transform.parent == null)
+        {
+            return;
+        }
+        if (!people.Contains(other.GetComponent<GameObject>()) && other.transform.parent.name == "SideCharacters")
         {
             people.Add(other.GetComponent<GameObject>());
+            
         }
+
+        if(transform.name=="Hero")
+            StoryIBT.blackboardTrigger[other.gameObject] = true;
+
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (people.Contains(other.GetComponent<GameObject>()))
+        if (people.Contains(other.GetComponent<GameObject>()) && other.transform.parent.name == "SideCharacters")
         {
             people.Remove(other.GetComponent<GameObject>());
         }
+        if (transform.name == "Hero")
+            StoryIBT.blackboardTrigger[other.gameObject] = false;
     }
 }

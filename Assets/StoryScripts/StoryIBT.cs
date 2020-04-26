@@ -11,7 +11,7 @@ public class StoryIBT : MonoBehaviour
 	public GameObject hero;
 	public GameObject enemy;
 	public GameObject sideCharactersParent;
-	
+	public static int clue_Count;
 	public static Dictionary<String, bool> blackboard = new Dictionary<String, bool>();
 	public static Dictionary<GameObject,bool> blackboardTrigger = new Dictionary<GameObject, bool>();
 	private static Vector3 targetPosition;
@@ -65,7 +65,7 @@ public class StoryIBT : MonoBehaviour
     {
 	    Val<Vector3> position = Val.V (() => targetPosition);
 	    return new DecoratorLoop( new Selector(new LeafAssert(()=> blackboard["move"] == false),
-		    new Sequence(hero.GetComponent<BehaviorMecanim>().Node_GoToUpToRadius(position,1f),
+		    new Sequence(hero.GetComponent<BehaviorMecanim>().Node_GoToUpToRadius(position,3f),
 			    new LeafInvoke(()=>blackboard["move"] = false))
 	    ));
     }
@@ -83,13 +83,15 @@ public class StoryIBT : MonoBehaviour
 	    RaycastHit hit;
 	    if (Input.GetMouseButton(0) && Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
 	    {
-		    if (hit.transform.parent == null)
+			
+			if (hit.transform.parent == null)
 		    {
 			    return RunStatus.Running;
 		    }
 		    if (hit.transform.parent.name.Equals("TerrainGroup_0"))
-		    {	
-			    blackboard["move"] = true;
+		    {
+				
+				blackboard["move"] = true;
 			    targetPosition = hit.point; 
 			} 
 	    }
@@ -105,7 +107,7 @@ public class StoryIBT : MonoBehaviour
 	private Node StoryTree()
 	{
 		return new Sequence(
-			StartStoryArc.Get());
+			InitialStory.Get(hero),middleStory.Get(hero));
 	}
 	private Node SideCharactersAffordances()
 	{

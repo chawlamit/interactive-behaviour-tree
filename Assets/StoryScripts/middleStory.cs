@@ -7,17 +7,17 @@ using UnityEngine.UI;
 public class middleStory
 {
 
-    public Node middlePart(GameObject hero)
+    public static Node Get(GameObject hero)
     {
-        return new DecoratorLoop(new Sequence(checkCount(), interactWithMob(hero)));
+        return new DecoratorInvert(new DecoratorLoop(new Sequence(checkCount(), interactWithMob(hero))));
     }
 
-    protected Node checkCount()
+    protected static Node checkCount()
     {
         return new LeafInvoke(() => clueCount());
     }
 
-    protected RunStatus clueCount()
+    protected static RunStatus clueCount()
     {
         if (StoryIBT.clue_Count < 3)
         {
@@ -29,7 +29,7 @@ public class middleStory
         }
     }
 
-    protected Node interactWithMob(GameObject hero)
+    protected static Node interactWithMob(GameObject hero)
     {
         playerScript heroPS = hero.GetComponent<playerScript>();
         
@@ -76,12 +76,12 @@ public class middleStory
     }
 
 
-    protected Node inquireAndRespond(GameObject player, string text)
+    protected static Node inquireAndRespond(GameObject player, string text)
     {       
        return new Sequence(new LeafInvoke(() => talk(player, text)),new LeafWait(2000),new LeafInvoke(()=>stopTalk(player)));             
     }
 
-    protected RunStatus talk(GameObject player, string text)
+    protected static RunStatus talk(GameObject player, string text)
     {
         playerScript heroPS = player.GetComponent<playerScript>();
         var heroDialogBox = heroPS.dialogBox;
