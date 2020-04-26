@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
-public class TriggeringSideCharacters : MonoBehaviour
+public class playerScript : MonoBehaviour
 {
     public List<GameObject> people;
     public GameObject dialogBox;
@@ -14,12 +14,19 @@ public class TriggeringSideCharacters : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (!people.Contains(other.GetComponent<GameObject>()) && other.transform.parent.name=="SideCharacters")
+        if (other.transform.parent == null)
+        {
+            return;
+        }
+        if (!people.Contains(other.GetComponent<GameObject>()) && other.transform.parent.name == "SideCharacters")
         {
             people.Add(other.GetComponent<GameObject>());
+            
         }
 
-        StoryIBT.blackboardTrigger[other.gameObject] = true;
+        if(transform.name=="Hero")
+            StoryIBT.blackboardTrigger[other.gameObject] = true;
+
     }
 
     private void OnTriggerExit(Collider other)
@@ -28,6 +35,7 @@ public class TriggeringSideCharacters : MonoBehaviour
         {
             people.Remove(other.GetComponent<GameObject>());
         }
-        StoryIBT.blackboardTrigger[other.gameObject] = false;
+        if (transform.name == "Hero")
+            StoryIBT.blackboardTrigger[other.gameObject] = false;
     }
 }
