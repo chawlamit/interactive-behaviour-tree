@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using RootMotion.FinalIK;
 using RootMotion.FinalIK.Demos;
 using UnityEngine;
 using TreeSharpPlus;
@@ -106,8 +107,8 @@ public class StoryIBT : MonoBehaviour
 	{
 		return new Sequence(
 			// StartStoryArc.Get(),
-			EndStoryArc.Get(hero, enemy,GameObject.FindGameObjectWithTag("enemyDoor")
-			));
+			EndStoryArc.Get(hero, enemy,GameObject.Find("Apartment_Door"))
+			);
 	}
 	private Node SideCharactersAffordances()
 	{
