@@ -110,7 +110,8 @@ public class StoryIBT : MonoBehaviour
 	{
 		return new Sequence(
 			// InitialStory.Get(hero),middleStory.Get(hero),
-			EndStoryArc.Get(hero, enemy,GameObject.Find("Aparment_Door"), GameObject.Find("Gun"))
+			EndStoryArc.Get(hero, enemy,GameObject.Find("Aparment_Door"))
+			
 			);
 	}
 	private Node SideCharactersAffordances()
