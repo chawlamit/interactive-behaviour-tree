@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TreeSharpPlus;
 
 public class dialogBoxScript : MonoBehaviour
 {
@@ -22,5 +23,12 @@ public class dialogBoxScript : MonoBehaviour
     {
         status = stat;
         this.gameObject.SetActive(stat);
+    }
+
+    public Node Node_show(bool stat)
+    {
+        return new Sequence( new LeafInvoke(()=>print("show")),
+            new LeafInvoke(()=>status=stat),
+            new LeafInvoke(()=>this.gameObject.SetActive(stat)));
     }
 }

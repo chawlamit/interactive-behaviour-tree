@@ -1,109 +1,78 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using TreeSharpPlus;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class middleStory
+public class middleStory:MonoBehaviour
 {
-
-    public static Node Get(GameObject hero)
+    private static string[] Askmessages = new[] {"Do you know where the devil is ?", "Am Looking for Devil, Do you know where he is ?", "Have an idea where devil is ?"};
+    private static string[] Replymessages = new[] {"Go Towards the Lake", "Near the Mountains", "Brown Door Gate"};
+    public static Node Get(GameObject hero, GameObject enemy)
     {
-        return new DecoratorInvert(new DecoratorLoop(new Sequence(checkCount(), interactWithMob(hero))));
+        return (new DecoratorLoop(new Sequence(
+            checkCount(), interactWithMob(hero,enemy))));
     }
 
     protected static Node checkCount()
     {
-        return new LeafInvoke(() => clueCount());
+        return new LeafAssert(() => StoryIBT.clue_Count < 1);
     }
 
-    protected static RunStatus clueCount()
+
+    protected static Node interactWithMob(GameObject hero,GameObject enemy)
     {
-        if (StoryIBT.clue_Count < 3)
+        return new Selector(
+            // outer if
+            new Sequence(new LeafAssert(() => StoryIBT.blackboard["talk"]),
+                                new Sequence(hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("Wave", 800),
+                                        new LeafWait(1000), StoryIBT.inquireAndRespond(hero, Askmessages[(new System.Random()).Next(3)]),
+                                        new LeafWait(1000),
+                                        TalkToChar(hero,enemy),
+                                        new LeafWait(1000),
+                                        hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("CHESTPUMPSALUTE", 500))
+
+                            ),
+            // outer else
+            new Sequence(new LeafInvoke(()=>print("middle")),
+                new LeafInvoke(() => RunStatus.Success))
+
+        );
+
+
+
+    }
+
+    static Node TalkToChar(GameObject hero,GameObject enemy)
+    {
+        Selector sp = new Selector();
+        foreach (var entry in StoryIBT.blackboardTrigger)
         {
-            return RunStatus.Success;
+            sp.Children.Add(
+                new Selector(
+                    new Sequence(new LeafAssert(()=>StoryIBT.ComeBack(entry.Key) && StoryIBT.CheckTrigger(entry.Key)),
+                        StoryIBT.inquireAndRespond(entry.Key, "I have already answered!"),
+                        new LeafInvoke(()=>StoryIBT.blackboard["talk"] = false)
+                    ),
+                    
+                    
+                    
+                    new Sequence(new LeafAssert(() => StoryIBT.CheckTrigger(entry.Key)),
+                entry.Key.GetComponent<BehaviorMecanim>().Node_OrientTowards(enemy.transform.position),
+                entry.Key.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("POINTING",5000),
+                StoryIBT.inquireAndRespond(entry.Key, Replymessages[(new System.Random()).Next(3)]),
+                entry.Key.GetComponent<BehaviorMecanim>().Node_OrientTowards(hero.transform.position),
+                new LeafInvoke(()=>StoryIBT.blackboard["talk"] = false),
+                new LeafInvoke(()=>StoryIBT.alreadytalked[entry.Key]=true),
+                new LeafInvoke(()=>StoryIBT.clue_Count += 1)
+                ))
+            );
         }
-        else
-        {
-            return RunStatus.Failure;
-        }
+
+        return sp;
     }
-
-    protected static Node interactWithMob(GameObject hero)
-    {
-        playerScript heroPS = hero.GetComponent<playerScript>();
-        
-        if ((StoryIBT.blackboard["talk"] == true) && heroPS.people.Count != 0)
-        {
-            var speaker2 = heroPS.people[0];
-            System.Random r = new System.Random();
-           
-            if (r.NextDouble() <= 0.5)
-            {
-                if (StoryIBT.clue_Count == 0)
-                {
-                   return new Sequence(hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("Wave", 300),
-                    new LeafWait(1000), inquireAndRespond(hero, "Do you Know where Devil Lives?"), new LeafWait(1000),
-                    speaker2.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("POINTING", 200), inquireAndRespond(speaker2, "Go Towards the Lake"),
-                    new LeafWait(1000), hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("CHESTPUMPSALUTE", 300));
-                }
-
-                if (StoryIBT.clue_Count == 1)
-                {
-                    return new Sequence(hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("Wave", 300),
-                    new LeafWait(1000), inquireAndRespond(hero, "I am Looking for Devil. Which Way?"), new LeafWait(1000),
-                    speaker2.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("POINTING", 200), inquireAndRespond(speaker2, "Near the Mountains"),
-                    new LeafWait(1000), hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("CHESTPUMPSALUTE", 300));
-                }
-
-                if (StoryIBT.clue_Count == 2)
-                {
-                    return new Sequence(hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("Wave", 300),
-                    new LeafWait(1000), inquireAndRespond(hero, "I am Looking for Devil. Which Way?"), new LeafWait(1000),
-                    speaker2.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("POINTING", 200), inquireAndRespond(speaker2, "Brown Door Gate"),
-                    new LeafWait(1000), hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("CHESTPUMPSALUTE", 300));
-                }
-            }
-            else
-            {
-               return new Sequence(hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("Wave", 300),
-                    new LeafWait(1000), inquireAndRespond(hero, "Do you Know where Devil Lives?"), new LeafWait(1000),
-                    speaker2.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("BEINGCOCKY", 200), inquireAndRespond(speaker2, "Get Away"));
-            }
-        }
-        return new LeafInvoke(()=>RunStatus.Success);
-
-    }
-
-
-    protected static Node inquireAndRespond(GameObject player, string text)
-    {       
-       return new Sequence(new LeafInvoke(() => talk(player, text)),new LeafWait(2000),new LeafInvoke(()=>stopTalk(player)));             
-    }
-
-    protected static RunStatus talk(GameObject player, string text)
-    {
-        playerScript heroPS = player.GetComponent<playerScript>();
-        var heroDialogBox = heroPS.dialogBox;
-        dialogBoxScript hdb = heroDialogBox.GetComponent<dialogBoxScript>();
-        hdb.show(true);
-        Text t= heroDialogBox.GetComponentInChildren<Text>();
-        t.text = text;           
-            
-        return RunStatus.Success;
-    }
-
-    protected static RunStatus stopTalk(GameObject player)
-    {
-        playerScript ps = player.GetComponent<playerScript>();
-        var dialogBox = ps.dialogBox;
-        dialogBoxScript dial = dialogBox.GetComponent<dialogBoxScript>();
-        dial.show(false);
-        Text t = dialogBox.GetComponentInChildren<Text>();
-        t.text = "";
-
-        return RunStatus.Success;
-
-    }
+    
+    
+    
 
 }

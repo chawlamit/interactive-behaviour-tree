@@ -10,7 +10,75 @@ public class sideCharacter : MonoBehaviour
     private static string[] affordances = new string[5]{"Think","MouthWipe","SatNightFever","Texting","ChestPumpSalute"};
     private static System.Random random = new System.Random();
 
+    
+    
     public static Node Get(GameObject hero, List<GameObject> sideCharacters)
+    {
+        SequenceParallel sp = new SequenceParallel();
+        foreach (var character in sideCharacters)
+        {
+            Val<Vector3> position = Val.V (() => hero.transform.position);
+           
+            Node interaction;    
+            if (character.CompareTag("Group"))
+            {
+                var child1 = character.transform.GetChild(0).gameObject;
+                var child2 = character.transform.GetChild(1).gameObject;
+                Val<Vector3> child1Position = Val.V(() => (child1.transform.position));
+                Val<Vector3> child2Position = Val.V(() => (child2.transform.position));
+                
+                if (StoryIBT.blackboardTrigger[child1] || StoryIBT.blackboardTrigger[child2] )
+                {
+                    interaction = new SequenceParallel(child1.GetComponent<BehaviorMecanim>()
+                        .Node_GoTo(Val
+                            .V(() => (hero.transform.position - new Vector3(1.0f,0,1.5f)))), 
+                        child2.GetComponent<BehaviorMecanim>()
+                            .Node_GoTo(Val
+                                .V(() => (hero.transform.position - new Vector3(2f,0,1.5f))))
+                        );
+                }
+                else
+                {
+                    interaction = new Sequence(
+                        new SequenceParallel(
+                            child1.GetComponent<BehaviorMecanim>().ST_TurnToFace(child2Position),
+                            child2.GetComponent<BehaviorMecanim>().ST_TurnToFace(child1Position)),
+                        new SequenceParallel(
+                            new Sequence(child1.GetComponent<BehaviorMecanim>()
+                                    .ST_TurnToFace(Val.V(() => (hero.transform.position))),
+                                child1.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("Wonderful", 2500)),
+                            new Sequence(child2.GetComponent<BehaviorMecanim>()
+                                    .ST_TurnToFace(Val.V(() => (hero.transform.position))),
+                                child2.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("cheer", 2500))
+                        )
+                    );
+                }
+            
+            }
+            else
+            {
+                if (StoryIBT.blackboardTrigger[character])
+                {
+                    interaction = character.GetComponent<BehaviorMecanim>()
+                        .Node_GoTo(Val.V(() => (hero.transform.position - new Vector3(1.5f,0,1.5f))));
+                }
+                else
+                {
+                    var next = Val.V(() => affordances[random.Next(5)]);
+                    interaction = character.GetComponent<BehaviorMecanim>()
+                        .ST_PlayHandGesture(next, 5000);
+                }
+            }
+            // Node interaction = new LeafInvoke(()=>print("test"));
+            sp.Children.Add(interaction);
+        }
+        return sp;
+    }
+    
+    
+    
+    
+    public static Node Get2(GameObject hero, List<GameObject> sideCharacters)
     {
         SequenceParallel sp = new SequenceParallel();
         foreach (var character in sideCharacters)
@@ -31,8 +99,7 @@ public class sideCharacter : MonoBehaviour
                                 character.transform.GetChild(1).gameObject.GetComponent<BehaviorMecanim>()
                                     .ST_TurnToFace(Val.V(() => (hero.transform.position))),
                                 hero.GetComponent<BehaviorMecanim>().ST_TurnToFace(Val.V(() =>
-                                    character.transform.GetChild(0).transform.position)),
-                                new LeafInvoke(()=>print("Group Trigger"))
+                                    character.transform.GetChild(0).transform.position))
                             ),
                             
                             // The sequence when hero not nearby : Currently do Animations one after another
@@ -74,8 +141,8 @@ public class sideCharacter : MonoBehaviour
                         // )
                     // )
                     );
-
-
+    
+    
         // Code converted above
            
         // Node interaction;    
@@ -131,6 +198,6 @@ public class sideCharacter : MonoBehaviour
             // Node interaction = new LeafInvoke(()=>print("test"));
             sp.Children.Add(interaction);
         }
-        return new DecoratorLoop(sp);
+        return sp;
     }   
 }
