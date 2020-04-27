@@ -6,6 +6,6 @@ Social-Forces-B4.sln
 Temp/
 Assembly-CSharp.csproj
 #Ignore all .meta file
-*.meta
+#*.meta
 #But not source file with postfix. which is everything but a folder
-!*.*.meta
+#!*.*.meta
