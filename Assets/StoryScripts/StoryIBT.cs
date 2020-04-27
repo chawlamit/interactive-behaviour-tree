@@ -57,13 +57,7 @@ public class StoryIBT : MonoBehaviour
 	    BehaviorManager.Instance.Register (behaviorAgent);
 	    behaviorAgent.StartBehavior ();
     }
-
-    private void Update()
-    {
-	    Debug.Log("b: "+ blackboard["talk"]);
-	    Debug.Log("c: "+ clue_Count);
-    }
-
+    
     public static bool CheckTrigger(GameObject go)
     {
 	    return blackboardTrigger[go];
@@ -133,9 +127,9 @@ public class StoryIBT : MonoBehaviour
 	    private Node StoryTree()
 	    {
 		    return new Sequence(
-			    InitialStory.Get(hero),
-			    middleStory.Get(hero, enemy),
-			    EndStoryArc.Get(hero, enemy, GameObject.Find("Aparment_Door")));
+			    // InitialStory.Get(hero),
+			    // middleStory.Get(hero, enemy),
+		    EndStoryArc.Get(hero, enemy, GameObject.Find("Aparment_Door")));
 	    }
 	    private Node SideCharactersAffordances()
 	    {
@@ -169,7 +163,7 @@ public class StoryIBT : MonoBehaviour
 	    {
 
 		    var p = Val.V(() => player);
-		    return new Sequence( new LeafInvoke(()=>print("talk3")),
+		    return new Sequence( 
 			    p.Value.GetComponent<playerScript>().dialogBox.GetComponent<dialogBoxScript>().Node_show(false),
 			    new LeafInvoke(() =>
 				    p.Value.GetComponent<playerScript>().dialogBox.GetComponent<dialogBoxScript>()

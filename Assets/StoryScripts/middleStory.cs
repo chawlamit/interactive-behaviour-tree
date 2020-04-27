@@ -10,7 +10,7 @@ public class middleStory:MonoBehaviour
     private static string[] Replymessages = new[] {"Go Towards the Lake", "Near the Mountains", "Brown Door Gate"};
     public static Node Get(GameObject hero, GameObject enemy)
     {
-        return (new DecoratorLoop(new Sequence(
+        return new DecoratorInvert(new DecoratorLoop(new Sequence(
             checkCount(), interactWithMob(hero,enemy))));
     }
 
@@ -34,8 +34,7 @@ public class middleStory:MonoBehaviour
 
                             ),
             // outer else
-            new Sequence(new LeafInvoke(()=>print("middle")),
-                new LeafInvoke(() => RunStatus.Success))
+            new LeafInvoke(() => RunStatus.Success)
 
         );
 

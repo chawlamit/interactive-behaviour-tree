@@ -27,7 +27,7 @@ public class dialogBoxScript : MonoBehaviour
 
     public Node Node_show(bool stat)
     {
-        return new Sequence( new LeafInvoke(()=>print("show")),
+        return new Sequence( 
             new LeafInvoke(()=>status=stat),
             new LeafInvoke(()=>this.gameObject.SetActive(stat)));
     }
