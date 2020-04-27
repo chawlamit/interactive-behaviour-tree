@@ -45,7 +45,7 @@ namespace StoryScripts
         private static Node GotoEnemyHouse(Vector3 enemyDoor)
         {
             // enemyDoor.y = 0;
-            enemyDoor += new Vector3(30f, 0f, -30f); // stand 2m away from the door
+            enemyDoor += new Vector3(50f, 0f, -30f); // stand 2m away from the door
             Val<Vector3> pos = Val.V(() => enemyDoor);
             return hero.GetComponent<BehaviorMecanim>().Node_GoTo(pos);
         }
