@@ -7,7 +7,11 @@ public class InitialStory
 {
     public static Node Get(GameObject hero)
     {
-        return new Sequence(new LeafWait(1000), selfTalk(hero, "Where is he?"), new LeafWait(3000), hideBoxTalk(hero), selfTalk(hero, "Must be hiding somewhere"), new LeafWait(3000), hideBoxTalk(hero));
+        return new Sequence(new LeafWait(1000), selfTalk(hero, "I have come so far!!"), new LeafWait(3000), 
+            hideBoxTalk(hero), selfTalk(hero, "This time I'll definitely catch him and make him pay for his mistakes")
+            ,new LeafWait(3000), hideBoxTalk(hero),
+            selfTalk(hero, "Let me ask around.... and figure out where exactly is he hiding")
+            ,new LeafWait(3000), hideBoxTalk(hero));
 
     }
 

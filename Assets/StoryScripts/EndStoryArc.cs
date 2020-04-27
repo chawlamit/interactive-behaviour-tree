@@ -2,6 +2,7 @@ using RootMotion.FinalIK;
 using RootMotion.FinalIK.Demos;
 using TreeSharpPlus;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace StoryScripts
 {
@@ -11,7 +12,7 @@ namespace StoryScripts
         private static GameObject enemy;
     
     
-        public static Node Get(GameObject heroObj, GameObject enemyObj, GameObject apartment_door)
+        public static Node Get(GameObject heroObj, GameObject enemyObj, GameObject apartment_door, GameObject status)
         {
             hero = heroObj;
             enemy = enemyObj;
@@ -20,10 +21,14 @@ namespace StoryScripts
             return new Sequence(
                 GotoEnemyHouse(apartment_door.transform.position),
                 new LeafWait(500),
+                
+                StoryIBT.inquireAndRespond(heroObj, "I can feel it in my gut, he's hiding here..."),
+                new LeafWait(500),
                 TakeOutGun(hero),
                 new LeafWait(200),
                 OpenDoorIkAnim(apartment_door: apartment_door),
                 new LeafWait(500),
+                
                 new
                     SelectorParallel( //go inside the house with piston holding up and stop whenever either of them succeeds
                         hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("Pistolaim", 10000),
@@ -31,13 +36,16 @@ namespace StoryScripts
                     ),
                 hero.GetComponent<BehaviorMecanim>().ST_TurnToFace(enemy.transform.position),
                 new LeafWait(400),
+                StoryIBT.inquireAndRespond(heroObj,"Finally, Here you are! You have no idea how long I have been looking for you Johnny"),
+                new LeafWait(400),
                 enemy.GetComponent<BehaviorMecanim>().ST_TurnToFace(hero.transform.position),
+                StoryIBT.inquireAndRespond(heroObj,"I have come to avenge Mr. Miyagi's death. It's time you paid for your sins"),
                 new LeafWait(400),
                 // focus camera on the enemy
                 // Random selection, who kills whom
                 new RandomSelector(
-                    HeroKillsEnemy(),
-                    EnemyKillsHero()
+                    HeroKillsEnemy(status),
+                    EnemyKillsHero(status)
                 ));
         }
       
@@ -125,32 +133,37 @@ namespace StoryScripts
 
         #region kill
 
-        private static Node HeroKillsEnemy()
+        private static Node HeroKillsEnemy(GameObject status)
         {
             return new Sequence(
                 new LeafInvoke(() => Debug.Log("Hero Wins")),
+                StoryIBT.inquireAndRespond(hero, "It time you met you met your creator"),
                 new SequenceParallel(
                         hero.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("Pistolaim", 6000),
                                         enemy.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("HANDSUP", 3000)
                     ),
                 
                 // hero says - f**k you
-                enemy.GetComponent<BehaviorMecanim>().ST_PlayBodyGesture("DYING", 20000)
+                enemy.GetComponent<BehaviorMecanim>().ST_PlayBodyGesture("DYING", 50000),
+                new LeafInvoke(()=> status.GetComponent<Text>().text = "Hero Wins")
                 );
         }
         
-        private static Node EnemyKillsHero()
+        private static Node EnemyKillsHero(GameObject status)
         {
             return new Sequence(
-                new LeafInvoke(() => Debug.Log("Hero Wins")),
+                new LeafInvoke(() => Debug.Log("Enemy Wins")),
 
                 TakeOutGun(enemy),
+                StoryIBT.inquireAndRespond(enemy, "You have always been too slow"),
                 new SequenceParallel(
                 enemy.GetComponent<BehaviorMecanim>().ST_PlayHandGesture("Pistolaim", 3000),
                     // enemy says - too slow, f**k you
-                    hero.GetComponent<BehaviorMecanim>().ST_PlayBodyGesture("DYING", 10000)
-                )
+                    hero.GetComponent<BehaviorMecanim>().ST_PlayBodyGesture("DYING", 50000)
+                ),
+                StoryIBT.inquireAndRespond(enemy, "This is not your silly movie, Hero's don't win here"),
                 // sad hero cries and dies
+                new LeafInvoke(()=> status.GetComponent<Text>().text = "Enemy Wins")
             );
 
         }

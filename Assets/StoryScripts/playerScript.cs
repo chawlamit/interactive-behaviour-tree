@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+using UnityEngine.UI;
 public class playerScript : MonoBehaviour
 {
     
     public GameObject dialogBox;
     // Start is called before the first frame update
+    public Text tmp;
     
     private void OnTriggerEnter(Collider other)
     {
@@ -26,6 +27,16 @@ public class playerScript : MonoBehaviour
 
         StoryIBT.blackboardTrigger[other.gameObject] = true;
 
+        if (tmp != null && !StoryIBT.blackboard["talk"] )
+        {
+            tmp.text = "Press T to Talk";
+        }
+
+        if (StoryIBT.blackboard["talk"])
+        {
+            tmp.text = "Talking in progress...";
+        }
+
     }
 
     private void OnTriggerExit(Collider other)
@@ -36,5 +47,9 @@ public class playerScript : MonoBehaviour
         }
         
         StoryIBT.blackboardTrigger[other.gameObject] = false;
+        if (tmp != null)
+        {
+            tmp.text = "";
+        }
     }
 }

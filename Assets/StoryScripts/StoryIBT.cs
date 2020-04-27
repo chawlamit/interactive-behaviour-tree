@@ -127,9 +127,9 @@ public class StoryIBT : MonoBehaviour
 	    private Node StoryTree()
 	    {
 		    return new Sequence(
-			    // InitialStory.Get(hero),
-			    // middleStory.Get(hero, enemy),
-		    EndStoryArc.Get(hero, enemy, GameObject.Find("Aparment_Door")));
+			    InitialStory.Get(hero),
+			    middleStory.Get(hero, enemy),
+		    EndStoryArc.Get(hero, enemy, GameObject.Find("Aparment_Door"), GameObject.Find("StatusText")));
 	    }
 	    private Node SideCharactersAffordances()
 	    {
@@ -143,7 +143,7 @@ public class StoryIBT : MonoBehaviour
 	    
 	    public static Node inquireAndRespond(GameObject player, string text)
 	    {
-		    return new Sequence(talk(player, text), new LeafWait(1000),
+		    return new Sequence(talk(player, text), new LeafWait(3000),
 		    stopTalk(player));
 	    }
 
